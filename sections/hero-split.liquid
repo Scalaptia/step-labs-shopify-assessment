@@ -1,0 +1,769 @@
+{%- liquid
+  assign heading_font = section.settings.heading_font
+  assign heading_font_italic = heading_font | font_modify: 'style', 'italic'
+  assign body_font = section.settings.body_font
+  assign body_font_strong = body_font | font_modify: 'weight', '+200' | default: body_font
+  assign button_font = section.settings.button_font
+
+  assign image_position = section.settings.image.presentation.focal_point | default: 'center' | prepend: 'object-position: '
+
+  if section.index > 1
+    assign image_loading = 'lazy'
+  else
+    assign image_loading = 'eager'
+  endif
+-%}
+
+{% style %}
+  {{ heading_font | font_face: font_display: 'swap' }}
+  {{ heading_font_italic | font_face: font_display: 'swap' }}
+  {{ body_font | font_face: font_display: 'swap' }}
+  {{ body_font_strong | font_face: font_display: 'swap' }}
+  {{ button_font | font_face: font_display: 'swap' }}
+
+  #shopify-section-{{ section.id }} .hero-split {
+    --hero-split-background: {{ section.settings.background }};
+    --hero-split-heading-color: {{ section.settings.heading_color }};
+    --hero-split-text-color: {{ section.settings.text_color }};
+    --hero-split-muted-color: {{ section.settings.muted_color }};
+    --hero-split-accent: {{ section.settings.accent_color }};
+    --hero-split-accent-contrast: {{ section.settings.accent_contrast_color }};
+    --hero-split-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }};
+    --hero-split-heading-weight: {{ heading_font.weight }};
+    --hero-split-body-font: {{ body_font.family }}, {{ body_font.fallback_families }};
+    --hero-split-body-weight: {{ body_font.weight }};
+    --hero-split-body-strong-weight: {{ body_font_strong.weight }};
+    --hero-split-button-font: {{ button_font.family }}, {{ button_font.fallback_families }};
+    --hero-split-button-weight: {{ button_font.weight }};
+    --hero-split-min-height: {{ section.settings.min_height }}px;
+  }
+{% endstyle %}
+
+<div class="hero-split">
+  <div class="hero-split__content">
+    <div class="hero-split__inner">
+      {%- comment -%}
+        Consecutive feature blocks are collected and printed as one row, so
+        merchants can place feature groups anywhere in the block order.
+      {%- endcomment -%}
+      {%- assign features_html = '' -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'feature' -%}
+          {%- if block.settings.text == blank and block.settings.custom_icon == blank and block.settings.icon == 'none' -%}
+            {%- continue -%}
+          {%- endif -%}
+          {%- capture feature_html -%}
+            <li class="hero-split__feature" {{ block.shopify_attributes }}>
+              {%- if block.settings.custom_icon != blank -%}
+                {{ block.settings.custom_icon | image_url: width: 80 | image_tag: class: 'hero-split__feature-icon', width: 40, height: 40, alt: '', loading: 'lazy' }}
+              {%- elsif block.settings.icon != 'none' -%}
+                <span class="hero-split__feature-icon">
+                  {{- 'hero-split-icon-' | append: block.settings.icon | append: '.svg' | inline_asset_content -}}
+                </span>
+              {%- endif -%}
+              <span class="hero-split__feature-text">{{ block.settings.text | escape | newline_to_br }}</span>
+            </li>
+          {%- endcapture -%}
+          {%- assign features_html = features_html | append: feature_html -%}
+        {%- else -%}
+          {%- if features_html != blank -%}
+            <ul class="hero-split__features" role="list">{{ features_html }}</ul>
+            {%- assign features_html = '' -%}
+          {%- endif -%}
+
+          {%- case block.type -%}
+            {%- when 'rating' -%}
+              {%- if block.settings.stars == 0 and block.settings.text == blank -%}
+                {%- continue -%}
+              {%- endif -%}
+              <div class="hero-split__rating" {{ block.shopify_attributes }}>
+                {%- if block.settings.stars > 0 -%}
+                  {%- if block.settings.stars_label != blank -%}
+                    <span class="visually-hidden">{{ block.settings.stars_label | escape }}</span>
+                  {%- endif -%}
+                  <span class="hero-split__stars" aria-hidden="true">
+                    {%- for i in (1..block.settings.stars) -%}
+                      {{- 'hero-split-star.svg' | inline_asset_content -}}
+                    {%- endfor -%}
+                  </span>
+                {%- endif -%}
+                {%- if block.settings.text != blank -%}
+                  <p class="hero-split__rating-text">{{ block.settings.text | escape }}</p>
+                {%- endif -%}
+              </div>
+
+            {%- when 'heading' -%}
+              <h2 class="hero-split__heading" {{ block.shopify_attributes }}>
+                {{- block.settings.heading | escape -}}
+                {%- if block.settings.heading_italic != blank -%}
+                  <span class="hero-split__heading-italic">{{ block.settings.heading_italic | escape }}</span>
+                {%- endif -%}
+              </h2>
+
+            {%- when 'text' -%}
+              <div class="hero-split__text" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+
+            {%- when 'buttons' -%}
+              {%- if block.settings.primary_label == blank and block.settings.secondary_label == blank -%}
+                {%- continue -%}
+              {%- endif -%}
+              <div class="hero-split__buttons" {{ block.shopify_attributes }}>
+                {%- if block.settings.primary_label != blank -%}
+                  <a
+                    class="hero-split__button hero-split__button--primary"
+                    {% if block.settings.primary_link != blank %}
+                      href="{{ block.settings.primary_link }}"
+                    {% else %}
+                      role="link" aria-disabled="true"
+                    {% endif %}
+                  >
+                    {{- block.settings.primary_label | escape -}}
+                  </a>
+                {%- endif -%}
+                {%- if block.settings.secondary_label != blank -%}
+                  <a
+                    class="hero-split__button hero-split__button--secondary"
+                    {% if block.settings.secondary_link != blank %}
+                      href="{{ block.settings.secondary_link }}"
+                    {% else %}
+                      role="link" aria-disabled="true"
+                    {% endif %}
+                  >
+                    {{- block.settings.secondary_label | escape -}}
+                  </a>
+                {%- endif -%}
+              </div>
+
+            {%- when 'note' -%}
+              <p class="hero-split__note" {{ block.shopify_attributes }}>
+                {%- if block.settings.custom_icon != blank -%}
+                  {{ block.settings.custom_icon | image_url: width: 32 | image_tag: class: 'hero-split__note-icon', width: 16, height: 16, alt: '', loading: 'lazy' }}
+                {%- elsif block.settings.icon != 'none' -%}
+                  <span class="hero-split__note-icon">
+                    {{- 'hero-split-icon-' | append: block.settings.icon | append: '.svg' | inline_asset_content -}}
+                  </span>
+                {%- endif -%}
+                {{- block.settings.text | escape -}}
+              </p>
+          {%- endcase -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if features_html != blank -%}
+        <ul class="hero-split__features" role="list">{{ features_html }}</ul>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="hero-split__media">
+    {%- if section.settings.image != blank -%}
+      {{
+        section.settings.image
+        | image_url: width: 2880
+        | image_tag:
+          class: 'hero-split__image',
+          widths: '375, 550, 750, 1100, 1440, 1880, 2200, 2880',
+          sizes: '(min-width: 990px) 50vw, 100vw',
+          loading: image_loading,
+          style: image_position
+      }}
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'hero-split__image hero-split__image--placeholder' }}
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  /* Mobile first. Below 750px the image sits above the text; from 750px the
+     section splits side by side like Horizon's media-with-content section.
+     The design's exact desktop values apply from 1440px, the Figma width. */
+  .hero-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    background: var(--hero-split-background);
+    color: var(--hero-split-text-color);
+    font-family: var(--hero-split-body-font);
+    font-weight: var(--hero-split-body-weight);
+  }
+
+  .hero-split__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 20px 40px;
+  }
+
+  .hero-split__inner {
+    width: 100%;
+    max-width: 576px;
+  }
+
+  /* Wraps as a unit on narrow columns so the text drops below the stars. */
+  .hero-split__rating {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .hero-split__stars {
+    display: flex;
+    gap: 4px;
+    padding: 1px 2.96px 2px 0;
+    color: var(--hero-split-accent);
+  }
+
+  .hero-split__stars svg {
+    flex: none;
+  }
+
+  .hero-split__rating-text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--hero-split-text-color);
+  }
+
+  .hero-split__heading {
+    margin: 0;
+    font-family: var(--hero-split-heading-font);
+    font-weight: var(--hero-split-heading-weight);
+    font-style: normal;
+    font-size: clamp(28px, 9vw, 34px);
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--hero-split-heading-color);
+  }
+
+  .hero-split__heading-italic {
+    display: block;
+    font-style: italic;
+  }
+
+  .hero-split__text {
+    max-width: 415px;
+    padding: 8px 0 32px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--hero-split-muted-color);
+  }
+
+  .hero-split__text p {
+    margin: 0;
+  }
+
+  .hero-split__text p + p {
+    margin-top: 0.75em;
+  }
+
+  /* In the design the text block supplies this gap; keep it when that block is removed. */
+  :is(.hero-split__heading, .hero-split__rating) + .hero-split__buttons {
+    margin-top: 24px;
+  }
+
+  .hero-split__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .hero-split__button {
+    display: inline-flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 9px 26px;
+    border: 0;
+    border-radius: 50px;
+    font-family: var(--hero-split-button-font);
+    font-weight: var(--hero-split-button-weight);
+    font-size: 16px;
+    line-height: 22px;
+    letter-spacing: -0.48px;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .hero-split__button--primary {
+    background: var(--hero-split-accent);
+    color: var(--hero-split-accent-contrast);
+  }
+
+  .hero-split__button--secondary {
+    padding-block: 8px;
+    border: 1px solid var(--hero-split-accent);
+    color: var(--hero-split-accent);
+  }
+
+  .hero-split__button[href]:hover {
+    opacity: 0.85;
+  }
+
+  .hero-split__button[aria-disabled='true'] {
+    cursor: default;
+  }
+
+  .hero-split__button:focus-visible {
+    outline: 2px solid var(--hero-split-heading-color);
+    outline-offset: 2px;
+  }
+
+  /* Figma drops the icon about 3px below the text's center, most likely a font
+     metrics artifact from the original capture; it is centered here instead. */
+  .hero-split__note {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: 8px 0 16px;
+    font-weight: var(--hero-split-body-strong-weight);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--hero-split-heading-color);
+  }
+
+  .hero-split__note-icon {
+    flex: none;
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Compact features: one column per feature with the icon above the text.
+     Merchant line breaks are dropped here so labels wrap to the column. */
+  .hero-split__features {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    gap: 12px;
+    margin: 0;
+    padding: 24px 0 0;
+    list-style: none;
+  }
+
+  .hero-split__feature {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .hero-split__feature-icon {
+    flex: none;
+    width: 32px;
+    height: 32px;
+  }
+
+  .hero-split__feature-text {
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--hero-split-text-color);
+    text-wrap: balance;
+  }
+
+  .hero-split__feature-text br {
+    display: none;
+  }
+
+  /* Icons scale to their wrapper, so any built-in icon works at note (16px) or feature size. */
+  :is(.hero-split__feature-icon, .hero-split__note-icon) svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  img:is(.hero-split__feature-icon, .hero-split__note-icon) {
+    object-fit: contain;
+  }
+
+  .hero-split__media {
+    position: relative;
+    order: -1;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+
+  .hero-split__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero-split__image--placeholder {
+    background: rgb(0 0 0 / 0.06);
+  }
+
+  @media screen and (min-width: 750px) {
+    .hero-split {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      min-height: 560px;
+    }
+
+    .hero-split__media {
+      order: 0;
+      aspect-ratio: auto;
+    }
+
+    .hero-split__content {
+      padding: 48px 32px;
+    }
+
+    .hero-split__heading {
+      font-size: 32px;
+    }
+
+    .hero-split__button {
+      flex: none;
+    }
+
+    .hero-split__features {
+      gap: 16px;
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .hero-split {
+      min-height: var(--hero-split-min-height);
+    }
+
+    .hero-split__content {
+      padding: 40px;
+    }
+
+    .hero-split__heading {
+      font-size: 40px;
+    }
+  }
+
+  @media screen and (min-width: 1440px) {
+    /* On wide screens the text lines up with the theme's 1440px page container
+       (where the header logo sits) instead of hugging the viewport edge.
+       Percentages resolve against this column, which is half the section, so
+       100% - 720px is the container's left edge. */
+    .hero-split__content {
+      padding: 40px 80px 40px max(64px, calc(100% - 720px));
+    }
+
+    .hero-split__inner {
+      padding-top: 32px;
+    }
+
+    .hero-split__heading {
+      font-size: 48px;
+    }
+
+    .hero-split__features {
+      gap: 24px;
+      padding: 32px 0;
+    }
+
+    .hero-split__feature {
+      flex-direction: row;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .hero-split__feature-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .hero-split__feature-text {
+      font-size: 14px;
+      line-height: 1.5;
+      text-wrap: wrap;
+    }
+
+    .hero-split__feature-text br {
+      display: inline;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Split hero",
+  "tag": "section",
+  "class": "hero-split-section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "max_blocks": 16,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Media"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "Shown on the right on desktop and above the text on mobile. Set a focal point to control cropping."
+    },
+    {
+      "type": "range",
+      "id": "min_height",
+      "label": "Desktop minimum height",
+      "min": 400,
+      "max": 900,
+      "step": 10,
+      "unit": "px",
+      "default": 720
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#f9f5f3"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading and note",
+      "default": "#363636"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text and icons",
+      "default": "#232223"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Description",
+      "default": "#717171"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Stars and buttons",
+      "default": "#e10017"
+    },
+    {
+      "type": "color",
+      "id": "accent_contrast_color",
+      "label": "Primary button label",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Heading font",
+      "info": "Uses the italic style of this font for the second heading line when available.",
+      "default": "schibsted_grotesk_n6"
+    },
+    {
+      "type": "font_picker",
+      "id": "body_font",
+      "label": "Body font",
+      "default": "schibsted_grotesk_n4"
+    },
+    {
+      "type": "font_picker",
+      "id": "button_font",
+      "label": "Button font",
+      "default": "inter_n5"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "rating",
+      "name": "Rating",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "range",
+          "id": "stars",
+          "label": "Stars",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "stars_label",
+          "label": "Screen reader label",
+          "info": "Read aloud in place of the stars.",
+          "default": "Rated 4.9 out of 5 stars"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Trusted by 1,000+ happy customers"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Wake Up The"
+        },
+        {
+          "type": "text",
+          "id": "heading_italic",
+          "label": "Italic line",
+          "info": "Shown on its own line below the heading.",
+          "default": "Muscles That Matter."
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Suji delivers science-backed targeted compression — pain relief, muscle activation, and lasting strength in minutes, right from home.</p>"
+        }
+      ]
+    },
+    {
+      "type": "buttons",
+      "name": "Buttons",
+      "settings": [
+        {
+          "type": "text",
+          "id": "primary_label",
+          "label": "Primary button label",
+          "info": "Leave empty to hide the button.",
+          "default": "Try Suji"
+        },
+        {
+          "type": "url",
+          "id": "primary_link",
+          "label": "Primary button link"
+        },
+        {
+          "type": "text",
+          "id": "secondary_label",
+          "label": "Secondary button label",
+          "info": "Leave empty to hide the button.",
+          "default": "How It Works"
+        },
+        {
+          "type": "url",
+          "id": "secondary_link",
+          "label": "Secondary button link"
+        }
+      ]
+    },
+    {
+      "type": "note",
+      "name": "Note",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "clock", "label": "Clock" },
+            { "value": "target", "label": "Target" },
+            { "value": "arrows", "label": "Arrows" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "none", "label": "None" }
+          ],
+          "default": "clock"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_icon",
+          "label": "Custom icon",
+          "info": "Replaces the icon above. Displayed at 16 × 16 px."
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "30-day money back guarantee"
+        }
+      ]
+    },
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "target", "label": "Target" },
+            { "value": "arrows", "label": "Arrows" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "clock", "label": "Clock" },
+            { "value": "none", "label": "None" }
+          ],
+          "default": "target"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_icon",
+          "label": "Custom icon",
+          "info": "Replaces the icon above. Displayed at 40 × 40 px."
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "info": "Line breaks are kept. Features placed next to each other share one row.",
+          "default": "Activates Muscles\n& Builds Strength"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Split hero",
+      "category": "Banners",
+      "blocks": [
+        { "type": "rating" },
+        { "type": "heading" },
+        { "type": "text" },
+        {
+          "type": "buttons",
+          "settings": {
+            "primary_link": "/collections/all"
+          }
+        },
+        { "type": "note" },
+        { "type": "feature" },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "arrows",
+            "text": "Boosts Recovery\n& Circulation"
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "text": "Supports Healthy\nJoints & Movement"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
