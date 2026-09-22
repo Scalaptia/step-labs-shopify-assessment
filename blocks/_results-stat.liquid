@@ -1,0 +1,108 @@
+{% doc %}
+  A single statistic inside a Results stats group: a small label, a large
+  value and a bold description. Styled by the Results stats section.
+{% enddoc %}
+
+{%- liquid
+  # The value's setting id is "heading" so the editor sidebar lists the block by its value.
+  assign value = block.settings.heading
+  assign has_content = false
+  if block.settings.label != blank or value != blank or block.settings.description != blank
+    assign has_content = true
+  endif
+-%}
+
+{%- if has_content -%}
+  <div class="results-stat" {{ block.shopify_attributes }}>
+    {%- if block.settings.label != blank -%}
+      <p class="results-stat__label">{{ block.settings.label | escape }}</p>
+    {%- endif -%}
+    {%- if value != blank -%}
+      <p class="results-stat__value">{{ value | escape }}</p>
+    {%- endif -%}
+    {%- if block.settings.description != blank -%}
+      <p class="results-stat__description">{{ block.settings.description | escape }}</p>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  /* Right padding separates the two columns on narrow screens without moving
+     the second column, which starts at exactly half the row as in the design. */
+  .results-stat {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding-right: 16px;
+  }
+
+  .results-stat__label,
+  .results-stat__value,
+  .results-stat__description {
+    max-width: 276.47px;
+    margin: 0;
+  }
+
+  .results-stat__label {
+    min-height: 20px;
+    font-size: 14px;
+    line-height: 19.6px;
+    letter-spacing: -0.7px;
+  }
+
+  /* Scales with the stats row (a size container) so two values always fit
+     side by side; 11.12cqi is 70px at the design's 629.75px row. */
+  .results-stat__value {
+    font-size: clamp(36px, 4.9vw, 70px);
+    font-size: min(70px, 11.12cqi);
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+  }
+
+  .results-stat__description {
+    padding-top: 9.3px;
+    font-weight: var(--results-stats-body-bold-weight);
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .results-stat__description {
+      font-size: 16.1px;
+      line-height: 22.54px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Stat",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "info": "Superscript footnote marks like ¹ can be typed or pasted.",
+      "default": "In a clinical study¹"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Value",
+      "default": "2.0x"
+    },
+    {
+      "type": "text",
+      "id": "description",
+      "label": "Description",
+      "default": "muscle strength increase vs traditional low-load training"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Stat"
+    }
+  ]
+}
+{% endschema %}

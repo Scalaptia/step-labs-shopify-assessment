@@ -1,0 +1,404 @@
+{%- liquid
+  assign heading_font = section.settings.heading_font
+  assign heading_font_italic = heading_font | font_modify: 'style', 'italic'
+  assign body_font = section.settings.body_font
+  assign body_font_bold = body_font | font_modify: 'weight', 'bold' | default: body_font
+  assign button_font = section.settings.button_font
+
+  assign image = section.settings.image
+  assign image_position = image.presentation.focal_point | default: 'center' | prepend: 'object-position: '
+  assign anchor = section.settings.anchor | handleize
+-%}
+
+{% style %}
+  {{ heading_font | font_face: font_display: 'swap' }}
+  {{ heading_font_italic | font_face: font_display: 'swap' }}
+  {{ body_font | font_face: font_display: 'swap' }}
+  {{ body_font_bold | font_face: font_display: 'swap' }}
+  {{ button_font | font_face: font_display: 'swap' }}
+
+  #shopify-section-{{ section.id }} .results-stats {
+    --results-stats-background: {{ section.settings.background }};
+    --results-stats-text-color: {{ section.settings.text_color }};
+    --results-stats-heading-font: {{ heading_font.family }}, {{ heading_font.fallback_families }};
+    --results-stats-heading-weight: {{ heading_font.weight }};
+    --results-stats-body-font: {{ body_font.family }}, {{ body_font.fallback_families }};
+    --results-stats-body-weight: {{ body_font.weight }};
+    --results-stats-body-bold-weight: {{ body_font_bold.weight }};
+    --results-stats-button-font: {{ button_font.family }}, {{ button_font.fallback_families }};
+    --results-stats-button-weight: {{ button_font.weight }};
+  }
+{% endstyle %}
+
+<div class="results-stats"{% if anchor != blank %} id="{{ anchor }}"{% endif %}>
+  <div class="results-stats__inner">
+    <div class="results-stats__media">
+      {%- if image != blank -%}
+        {{
+          image
+          | image_url: width: 1400
+          | image_tag:
+            class: 'results-stats__image',
+            widths: '375, 550, 750, 1000, 1260, 1400',
+            sizes: '(min-width: 1440px) 630px, (min-width: 990px) calc(50vw - 60px), 100vw',
+            loading: 'lazy',
+            style: image_position
+        }}
+      {%- else -%}
+        {{ 'product-apparel-1' | placeholder_svg_tag: 'results-stats__image results-stats__image--placeholder' }}
+      {%- endif -%}
+    </div>
+
+    <div class="results-stats__content">
+      {%- if section.settings.heading != blank or section.settings.heading_italic != blank -%}
+        <h2 class="results-stats__heading">
+          {{- section.settings.heading | escape -}}
+          {%- if section.settings.heading_italic != blank -%}
+            <span class="results-stats__heading-italic">{{ section.settings.heading_italic | escape }}</span>
+          {%- endif -%}
+        </h2>
+      {%- endif -%}
+
+      <div class="results-stats__groups">
+        {%- content_for 'blocks' -%}
+      </div>
+
+      {%- if section.settings.button_label != blank or section.settings.footnotes != blank -%}
+        <div class="results-stats__footer">
+          {%- if section.settings.button_label != blank -%}
+            <a
+              class="results-stats__button"
+              {% if section.settings.button_link != blank %}
+                href="{{ section.settings.button_link }}"
+              {% else %}
+                role="link" aria-disabled="true"
+              {% endif %}
+            >
+              {{- section.settings.button_label | escape -}}
+              <span class="results-stats__button-icon">{{ 'results-stats-arrow.svg' | inline_asset_content }}</span>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.footnotes != blank -%}
+            <div class="results-stats__footnotes">{{ section.settings.footnotes }}</div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  /* Mobile first: the image stacks above the stats until 990px, where the
+     layout splits into two equal columns. Exact design values apply at 1440px. */
+  .results-stats {
+    padding: 32px 20px 40px;
+    background: var(--results-stats-background);
+    color: var(--results-stats-text-color);
+    font-family: var(--results-stats-body-font);
+    font-weight: var(--results-stats-body-weight);
+    scroll-margin-top: var(--header-height, 0px);
+  }
+
+  .results-stats__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  .results-stats__media {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
+
+  .results-stats__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .results-stats__image--placeholder {
+    background: rgb(0 0 0 / 0.06);
+  }
+
+  .results-stats__content {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    min-width: 0;
+  }
+
+  .results-stats__heading {
+    max-width: 614.39px;
+    margin: 0;
+    padding-bottom: 0.69px;
+    font-family: var(--results-stats-heading-font);
+    font-weight: var(--results-stats-heading-weight);
+    font-style: normal;
+    font-size: 32px;
+    line-height: 1.2;
+    letter-spacing: 0;
+    text-transform: none;
+    color: inherit;
+  }
+
+  .results-stats__heading-italic {
+    display: block;
+    font-style: italic;
+  }
+
+  .results-stats__groups {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .results-stats__groups:empty {
+    display: none;
+  }
+
+  .results-stats__footer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 9.2px;
+  }
+
+  .results-stats__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 9px 26px;
+    border: 1px solid currentColor;
+    border-radius: 50px;
+    font-family: var(--results-stats-button-font);
+    font-weight: var(--results-stats-button-weight);
+    font-size: 16px;
+    line-height: 22px;
+    letter-spacing: -0.48px;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .results-stats__button[href]:hover {
+    opacity: 0.85;
+  }
+
+  .results-stats__button[aria-disabled='true'] {
+    cursor: default;
+  }
+
+  .results-stats__button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  .results-stats__button-icon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+  }
+
+  .results-stats__footnotes {
+    font-size: 11px;
+    line-height: 15.4px;
+  }
+
+  .results-stats__footnotes p {
+    margin: 0;
+  }
+
+  @media screen and (min-width: 750px) {
+    .results-stats {
+      padding: 40px;
+    }
+
+    .results-stats__media {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .results-stats__inner {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+      gap: 40px;
+    }
+
+    .results-stats__media {
+      aspect-ratio: 629.75 / 767.98;
+    }
+
+    .results-stats__heading {
+      font-size: 40px;
+    }
+  }
+
+  /* At 1440px the columns are the design's 629.75px, starting 64px from the
+     edge. Wider screens keep that 1440px frame centered. */
+  @media screen and (min-width: 1440px) {
+    .results-stats {
+      padding: 40px 64px;
+    }
+
+    .results-stats__inner {
+      max-width: 1299.5px;
+      margin-left: max(0px, calc((100% - 1312px) / 2));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Results stats",
+  "tag": "section",
+  "class": "results-stats-section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "blocks": [{ "type": "_results-group" }],
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "Shown on the left on desktop and above the stats on mobile."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Backed by Science."
+    },
+    {
+      "type": "text",
+      "id": "heading_italic",
+      "label": "Italic line",
+      "info": "Shown on its own line below the heading.",
+      "default": "Proven by Results."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "info": "Leave empty to hide the button.",
+      "default": "See The Science"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "richtext",
+      "id": "footnotes",
+      "label": "Footnotes",
+      "info": "Sources for the stats. Each paragraph is a line.",
+      "default": "<p>¹Yasuda et al., 2010 ²Loenneke et al., 2012</p><p>³Takarada et al., 2000 ⁴Hughes et al., 2017</p>"
+    },
+    {
+      "type": "text",
+      "id": "anchor",
+      "label": "Anchor ID",
+      "info": "Lets buttons elsewhere link to this section, e.g. an ID of results is reached with #results. Use a different ID for each section."
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text, lines and button",
+      "default": "#262d33"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Heading font",
+      "info": "Uses the italic style of this font for the second heading line when available.",
+      "default": "schibsted_grotesk_n6"
+    },
+    {
+      "type": "font_picker",
+      "id": "body_font",
+      "label": "Stats font",
+      "info": "Descriptions use the bold style of this font.",
+      "default": "inter_n4"
+    },
+    {
+      "type": "font_picker",
+      "id": "button_font",
+      "label": "Button font",
+      "default": "inter_n5"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Results stats",
+      "category": "Text",
+      "blocks": [
+        {
+          "type": "_results-group",
+          "blocks": [
+            { "type": "_results-stat" },
+            {
+              "type": "_results-stat",
+              "settings": {
+                "label": "In a systematic review²",
+                "heading": "3.2X",
+                "description": "greater muscle mass gains compared to walking or light training without Targeted Compression/BFR"
+              }
+            }
+          ]
+        },
+        {
+          "type": "_results-group",
+          "settings": {
+            "title": "CLINICALLY SHOWN TO SPEED UP RECOVERY"
+          },
+          "blocks": [
+            {
+              "type": "_results-stat",
+              "settings": {
+                "label": "In a recovery study³",
+                "heading": "78%",
+                "description": "faster muscle recovery time post-exercise with Targeted Compression/BFR compared to passive rest"
+              }
+            },
+            {
+              "type": "_results-stat",
+              "settings": {
+                "label": "In a clinical trial⁴",
+                "heading": "40-50%",
+                "description": "pain reduction reported in individuals with chronic musculoskeletal pain"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,80 @@
+{% doc %}
+  A titled group of statistics for the Results stats section. Stat blocks are
+  nested inside it and laid out two per row.
+{% enddoc %}
+
+<div class="results-group" {{ block.shopify_attributes }}>
+  {%- if block.settings.title != blank -%}
+    <h3 class="results-group__title">{{ block.settings.title | escape }}</h3>
+  {%- endif -%}
+  <div class="results-group__stats">
+    {%- content_for 'blocks' -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .results-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .results-group__title {
+    max-width: 614.39px;
+    margin: 0;
+    padding-bottom: 10.2px;
+    border-bottom: 1px solid currentColor;
+    font-family: var(--results-stats-body-font);
+    font-weight: var(--results-stats-body-weight);
+    font-style: normal;
+    font-size: 18px;
+    line-height: 19.8px;
+    letter-spacing: -0.9px;
+    text-transform: none;
+    color: inherit;
+  }
+
+  .results-group__stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 24px;
+    container-type: inline-size;
+  }
+
+  .results-group__stats:empty {
+    display: none;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Stats group",
+  "tag": null,
+  "blocks": [{ "type": "_results-stat" }],
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "info": "Shown above the group with a divider line.",
+      "default": "BUILD LASTING STRENGTH IN JUST 3 SHORT SESSIONS A WEEK"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Stats group",
+      "blocks": [
+        { "type": "_results-stat" },
+        {
+          "type": "_results-stat",
+          "settings": {
+            "label": "In a systematic review²",
+            "heading": "3.2X",
+            "description": "greater muscle mass gains compared to walking or light training without Targeted Compression/BFR"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
