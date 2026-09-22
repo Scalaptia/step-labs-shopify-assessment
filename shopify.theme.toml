@@ -1,0 +1,3 @@
+[environments.development]
+store = "fernando-step-labs-assessment.myshopify.com"
+theme = "190449516829"
