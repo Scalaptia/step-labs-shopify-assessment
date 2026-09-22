@@ -8,6 +8,12 @@
   assign image = section.settings.image
   assign image_position = image.presentation.focal_point | default: 'center' | prepend: 'object-position: '
   assign anchor = section.settings.anchor | handleize
+
+  if section.index > 1
+    assign image_loading = 'lazy'
+  else
+    assign image_loading = 'eager'
+  endif
 -%}
 
 {% style %}
@@ -41,7 +47,7 @@
             class: 'results-stats__image',
             widths: '375, 550, 750, 1000, 1260, 1400',
             sizes: '(min-width: 1440px) 630px, (min-width: 990px) calc(50vw - 60px), 100vw',
-            loading: 'lazy',
+            loading: image_loading,
             style: image_position
         }}
       {%- else -%}
@@ -54,7 +60,7 @@
         <h2 class="results-stats__heading">
           {{- section.settings.heading | escape -}}
           {%- if section.settings.heading_italic != blank -%}
-            <span class="results-stats__heading-italic">{{ section.settings.heading_italic | escape }}</span>
+            {{ " " }}<span class="results-stats__heading-italic">{{ section.settings.heading_italic | escape }}</span>
           {%- endif -%}
         </h2>
       {%- endif -%}
@@ -241,7 +247,8 @@
   }
 
   /* At 1440px the columns are the design's 629.75px, starting 64px from the
-     edge. Wider screens keep that 1440px frame centered. */
+     edge. Wider screens align the image with the theme's 1440px page container,
+     where the header logo and hero text start. */
   @media screen and (min-width: 1440px) {
     .results-stats {
       padding: 40px 64px;
@@ -249,7 +256,7 @@
 
     .results-stats__inner {
       max-width: 1299.5px;
-      margin-left: max(0px, calc((100% - 1312px) / 2));
+      margin-left: max(0px, calc((100% - 1440px) / 2));
     }
   }
 {% endstylesheet %}
@@ -311,7 +318,7 @@
       "type": "text",
       "id": "anchor",
       "label": "Anchor ID",
-      "info": "Lets buttons elsewhere link to this section, e.g. an ID of results is reached with #results. Use a different ID for each section."
+      "info": "Lets buttons elsewhere link to this section, e.g. an ID of results is reached with #results. Duplicating the section copies this ID, so give each copy its own."
     },
     {
       "type": "header",

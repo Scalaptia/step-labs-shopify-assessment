@@ -66,6 +66,28 @@
           {%- endcapture -%}
           {%- assign features_html = features_html | append: feature_html -%}
         {%- else -%}
+          {%- liquid
+            assign renders_nothing = false
+            case block.type
+              when 'rating'
+                if block.settings.stars == 0 and block.settings.text == blank
+                  assign renders_nothing = true
+                endif
+              when 'heading'
+                if block.settings.heading == blank and block.settings.heading_italic == blank
+                  assign renders_nothing = true
+                endif
+              when 'buttons'
+                if block.settings.primary_label == blank and block.settings.secondary_label == blank
+                  assign renders_nothing = true
+                endif
+            endcase
+          -%}
+          {%- comment -%} Blank blocks are skipped before the feature row closes, so they don't split it. {%- endcomment -%}
+          {%- if renders_nothing -%}
+            {%- continue -%}
+          {%- endif -%}
+
           {%- if features_html != blank -%}
             <ul class="hero-split__features" role="list">{{ features_html }}</ul>
             {%- assign features_html = '' -%}
@@ -73,9 +95,6 @@
 
           {%- case block.type -%}
             {%- when 'rating' -%}
-              {%- if block.settings.stars == 0 and block.settings.text == blank -%}
-                {%- continue -%}
-              {%- endif -%}
               <div class="hero-split__rating" {{ block.shopify_attributes }}>
                 {%- if block.settings.stars > 0 -%}
                   {%- if block.settings.stars_label != blank -%}
@@ -96,7 +115,7 @@
               <h2 class="hero-split__heading" {{ block.shopify_attributes }}>
                 {{- block.settings.heading | escape -}}
                 {%- if block.settings.heading_italic != blank -%}
-                  <span class="hero-split__heading-italic">{{ block.settings.heading_italic | escape }}</span>
+                  {{ " " }}<span class="hero-split__heading-italic">{{ block.settings.heading_italic | escape }}</span>
                 {%- endif -%}
               </h2>
 
@@ -104,9 +123,6 @@
               <div class="hero-split__text" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
 
             {%- when 'buttons' -%}
-              {%- if block.settings.primary_label == blank and block.settings.secondary_label == blank -%}
-                {%- continue -%}
-              {%- endif -%}
               <div class="hero-split__buttons" {{ block.shopify_attributes }}>
                 {%- if block.settings.primary_label != blank -%}
                   <a
