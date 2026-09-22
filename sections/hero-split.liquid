@@ -332,9 +332,11 @@
     outline-offset: 2px;
   }
 
-  /* The icon sits 4px below the text's top edge, as in the design. */
+  /* Centered on smaller screens; the design's offset icon applies from 1440px. */
   .hero-split__note {
-    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
     margin: 0;
     padding: 8px 0 16px;
     font-weight: var(--hero-split-body-strong-weight);
@@ -343,14 +345,8 @@
     color: var(--hero-split-heading-color);
   }
 
-  .hero-split__note--icon {
-    padding-left: 20px;
-  }
-
   .hero-split__note-icon {
-    position: absolute;
-    top: 12px;
-    left: 0;
+    flex: none;
     width: 16px;
     height: 16px;
   }
@@ -473,6 +469,22 @@
 
     .hero-split__inner {
       padding-top: 32px;
+    }
+
+    /* The design places the icon 4px below the text's top edge. */
+    .hero-split__note {
+      display: block;
+      position: relative;
+    }
+
+    .hero-split__note--icon {
+      padding-left: 20px;
+    }
+
+    .hero-split__note-icon {
+      position: absolute;
+      top: 12px;
+      left: 0;
     }
 
     .hero-split__heading {
