@@ -2,7 +2,7 @@
 
 Two configurable sections built from the Step Labs Figma design, a split hero and a results stats section, on the Horizon 4.2.0 theme.
 
-- Preview: https://fernando-step-labs-assessment.myshopify.com/?preview_theme_id=190449516829
+- Store: https://fernando-step-labs-assessment.myshopify.com/
 
 ## Files
 
@@ -33,7 +33,7 @@ shopify theme dev --environment development
 shopify theme check
 ```
 
-`shopify.theme.toml` targets the unpublished assessment theme, so these commands don't touch the live theme.
+`shopify.theme.toml` points these commands at the assessment theme (#190449516829), which is the published theme, so `theme dev` and `theme push` edit the live store.
 
 ## Known limitations
 
