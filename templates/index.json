@@ -8,6 +8,68 @@
  * ------------------------------------------------------------
  */{
   "sections": {
+    "hero_split": {
+      "type": "hero-split",
+      "blocks": {
+        "rating": {
+          "type": "rating",
+          "settings": {}
+        },
+        "heading": {
+          "type": "heading",
+          "settings": {}
+        },
+        "text": {
+          "type": "text",
+          "settings": {}
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "primary_link": "shopify://collections/all",
+            "secondary_link": "#results"
+          }
+        },
+        "note": {
+          "type": "note",
+          "settings": {}
+        },
+        "feature_muscles": {
+          "type": "feature",
+          "settings": {
+            "icon": "target",
+            "text": "Activates Muscles\n& Builds Strength"
+          }
+        },
+        "feature_recovery": {
+          "type": "feature",
+          "settings": {
+            "icon": "arrows",
+            "text": "Boosts Recovery\n& Circulation"
+          }
+        },
+        "feature_joints": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "text": "Supports Healthy\nJoints & Movement"
+          }
+        }
+      },
+      "block_order": [
+        "rating",
+        "heading",
+        "text",
+        "buttons",
+        "note",
+        "feature_muscles",
+        "feature_recovery",
+        "feature_joints"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/suji-hero-thigh-band.png"
+      }
+    },
     "hero_jVaWmY": {
       "type": "hero",
       "blocks": {
@@ -279,6 +341,7 @@
     }
   },
   "order": [
+    "hero_split",
     "hero_jVaWmY",
     "product_list_fa6P9H"
   ]
