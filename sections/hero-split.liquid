@@ -135,7 +135,13 @@
               </div>
 
             {%- when 'note' -%}
-              <p class="hero-split__note" {{ block.shopify_attributes }}>
+              {%- liquid
+                assign note_class = 'hero-split__note'
+                if block.settings.custom_icon != blank or block.settings.icon != 'none'
+                  assign note_class = note_class | append: ' hero-split__note--icon'
+                endif
+              -%}
+              <p class="{{ note_class }}" {{ block.shopify_attributes }}>
                 {%- if block.settings.custom_icon != blank -%}
                   {{ block.settings.custom_icon | image_url: width: 32 | image_tag: class: 'hero-split__note-icon', width: 16, height: 16, alt: '', loading: 'lazy' }}
                 {%- elsif block.settings.icon != 'none' -%}
@@ -310,12 +316,9 @@
     outline-offset: 2px;
   }
 
-  /* Figma drops the icon about 3px below the text's center, most likely a font
-     metrics artifact from the original capture; it is centered here instead. */
+  /* The icon sits 4px below the text's top edge, as in the design. */
   .hero-split__note {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    position: relative;
     margin: 0;
     padding: 8px 0 16px;
     font-weight: var(--hero-split-body-strong-weight);
@@ -324,8 +327,14 @@
     color: var(--hero-split-heading-color);
   }
 
+  .hero-split__note--icon {
+    padding-left: 20px;
+  }
+
   .hero-split__note-icon {
-    flex: none;
+    position: absolute;
+    top: 12px;
+    left: 0;
     width: 16px;
     height: 16px;
   }
