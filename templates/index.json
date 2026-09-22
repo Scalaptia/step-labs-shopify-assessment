@@ -70,6 +70,76 @@
         "image": "shopify://shop_images/suji-hero-thigh-band.png"
       }
     },
+    "results_stats": {
+      "type": "results-stats",
+      "settings": {
+        "image": "shopify://shop_images/suji-band-with-app.jpg",
+        "anchor": "results",
+        "button_link": "shopify://collections/all"
+      },
+      "blocks": {
+        "group_strength": {
+          "type": "_results-group",
+          "settings": {
+            "title": "BUILD LASTING STRENGTH IN JUST 3 SHORT SESSIONS A WEEK"
+          },
+          "blocks": {
+            "stat_strength": {
+              "type": "_results-stat",
+              "settings": {
+                "label": "In a clinical study¹",
+                "description": "muscle strength increase vs traditional low-load training",
+                "heading": "2.0x"
+              }
+            },
+            "stat_mass": {
+              "type": "_results-stat",
+              "settings": {
+                "label": "In a systematic review²",
+                "description": "greater muscle mass gains compared to walking or light training without Targeted Compression/BFR",
+                "heading": "3.2X"
+              }
+            }
+          },
+          "block_order": [
+            "stat_strength",
+            "stat_mass"
+          ]
+        },
+        "group_recovery": {
+          "type": "_results-group",
+          "settings": {
+            "title": "CLINICALLY SHOWN TO SPEED UP RECOVERY"
+          },
+          "blocks": {
+            "stat_recovery": {
+              "type": "_results-stat",
+              "settings": {
+                "label": "In a recovery study³",
+                "description": "faster muscle recovery time post-exercise with Targeted Compression/BFR compared to passive rest",
+                "heading": "78%"
+              }
+            },
+            "stat_pain": {
+              "type": "_results-stat",
+              "settings": {
+                "label": "In a clinical trial⁴",
+                "description": "pain reduction reported in individuals with chronic musculoskeletal pain",
+                "heading": "40-50%"
+              }
+            }
+          },
+          "block_order": [
+            "stat_recovery",
+            "stat_pain"
+          ]
+        }
+      },
+      "block_order": [
+        "group_strength",
+        "group_recovery"
+      ]
+    },
     "hero_jVaWmY": {
       "type": "hero",
       "blocks": {
@@ -342,6 +412,7 @@
   },
   "order": [
     "hero_split",
+    "results_stats",
     "hero_jVaWmY",
     "product_list_fa6P9H"
   ]
