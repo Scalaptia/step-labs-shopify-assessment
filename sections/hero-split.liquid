@@ -185,7 +185,7 @@
         | image_tag:
           class: 'hero-split__image',
           widths: '375, 550, 750, 1100, 1440, 1880, 2200, 2880',
-          sizes: '(min-width: 990px) 50vw, 100vw',
+          sizes: '(min-width: 750px) 50vw, 100vw',
           loading: image_loading,
           style: image_position
       }}
@@ -351,13 +351,13 @@
     height: 16px;
   }
 
-  /* Compact features: one column per feature with the icon above the text.
-     Merchant line breaks are dropped here so labels wrap to the column. */
+  /* Features sit three per row, and any extra wrap onto new rows. Below 1440px
+     the icon sits above the text and merchant line breaks are dropped so labels
+     wrap to the column. */
   .hero-split__features {
     display: grid;
-    grid-auto-columns: minmax(0, 1fr);
-    grid-auto-flow: column;
-    gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px 12px;
     margin: 0;
     padding: 24px 0 0;
     list-style: none;
@@ -377,6 +377,7 @@
   }
 
   .hero-split__feature-text {
+    overflow-wrap: anywhere;
     font-size: 13px;
     line-height: 1.4;
     color: var(--hero-split-text-color);
@@ -440,7 +441,7 @@
     }
 
     .hero-split__features {
-      gap: 16px;
+      gap: 20px 16px;
     }
   }
 
@@ -763,7 +764,7 @@
           "type": "textarea",
           "id": "text",
           "label": "Text",
-          "info": "Line breaks are kept. Features placed next to each other share one row.",
+          "info": "Line breaks apply on desktop. Features sit three per row, and extras wrap onto new rows.",
           "default": "Activates Muscles\n& Builds Strength"
         }
       ]
