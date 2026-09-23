@@ -81,7 +81,9 @@
               {% endif %}
             >
               {{- section.settings.button_label | escape -}}
-              <span class="results-stats__button-icon">{{ 'results-stats-arrow.svg' | inline_asset_content }}</span>
+              {%- if section.settings.button_arrow -%}
+                <span class="results-stats__button-icon">{{ 'results-stats-arrow.svg' | inline_asset_content }}</span>
+              {%- endif -%}
             </a>
           {%- endif -%}
           {%- if section.settings.footnotes != blank -%}
@@ -306,6 +308,12 @@
       "type": "url",
       "id": "button_link",
       "label": "Button link"
+    },
+    {
+      "type": "checkbox",
+      "id": "button_arrow",
+      "label": "Show arrow on button",
+      "default": true
     },
     {
       "type": "richtext",
