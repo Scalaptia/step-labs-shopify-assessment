@@ -38,3 +38,5 @@ shopify theme check
 ## Known limitations
 
 - The Figma hero photo is only 720px wide, so it looks soft on large screens.
+- "See The Science" links to the product catalog as a placeholder, since the store has no science page. The link is a section setting.
+- Duplicating the results section copies its anchor ID, so change the ID on the copy.
